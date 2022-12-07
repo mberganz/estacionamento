@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:11.6
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: projeto
+    networks:
+      - postgres-compose-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U root -d projeto']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    links:
+      - db
+    depends_on:
+      - db
+    networks:
+      - postgres-compose-network
+
+networks:
+  postgres-compose-network:
+    driver: bridge
